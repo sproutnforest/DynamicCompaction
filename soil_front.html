@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan Dynamic Compaction</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; 
+            line-height: 1.6;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .grid-container {
+            /* Area visualisasi grid. Isi dengan diagram grid (gambar/SVG) di backend JS. */
+            min-height: 300px;
+            position: relative;
+            overflow: hidden; 
+            background-color: #f0f0f0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        
+        .form-label.small {
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        /* Penyesuaian khusus untuk tabel referensi */
+        .table-ref th, .table-ref td {
+            vertical-align: middle;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container my-5 p-4 bg-white rounded shadow-lg">
+        <h1 class="text-center text-primary mb-4 pb-2 border-bottom border-primary">Perancangan Program Dynamic Compaction</h1>
+
+        <section class="mb-5 p-3 border rounded">
+            <h2 class="text-success border-bottom pb-2 mb-3">1. Parameter Desain & Input Dasar</h2>
+            <div class="row g-3">
+                
+                <div class="col-md-6">
+                    <label for="soilType" class="form-label fw-bold">Jenis Lapisan Tanah:</label>
+                    <select id="soilType" class="form-select" onchange="updateReferences()"> 
+                        <option value="wasteFill" selected>Tempat Pembuangan Sampah/Urugan</option>
+                        <option value="granularCoarse">Tanah berbutir kasar lolos air</option>
+                        <option value="granularFine">Tanah berbutir halus semi lolos air</option>
+                        <option value="granular">Lapisan tanah lolos air—tanah granular</option>
+                        <option value="siltyPIGreater8">Lapisan tanah kedap air—penyusun utama lanau (PI > 8)</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-6">
+                    <label for="unitAppliedEnergy" class="form-label fw-bold">Energi Satuan (E) [kJ/m³]:</label>
+                    <input type="number" id="unitAppliedEnergy" class="form-control" value="800" step="10" onchange="updateCalculation()">
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="saturationLevel" class="form-label fw-bold">Derajat Kejenuhan/Kepadatan:</label>
+                    <select id="saturationLevel" class="form-select" onchange="updateReferences()">
+                        <option value="medium" selected>Sedang (Landfill)</option>
+                        <option value="high">Tinggi</option>
+                        <option value="low">Rendah</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="empiricalConstant_n" class="form-label fw-bold">Koefisien Empiris (n):</label>
+                    <input type="number" id="empiricalConstant_n" class="form-control" value="0.4" step="0.01" onchange="updateCalculation()">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="compactorWeight" class="form-label fw-bold">Berat Pemukul (W) [ton]:</label>
+                    <input type="number" id="compactorWeight" class="form-control" value="14" step="0.1" onchange="updateCalculation()">
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="areaADepth" class="form-label fw-bold">Tebal Tanah Area A (D) [m]:</label>
+                    <input type="number" id="areaADepth" class="form-control" value="6.0" step="0.1" onchange="updateCalculation()">
+                </div>
+                <div class="col-md-4">
+                    <label for="areaBDepth" class="form-label fw-bold">Tebal Tanah Area B (D) [m]:</label>
+                    <input type="number" id="areaBDepth" class="form-control" value="3.50" step="0.1" onchange="updateCalculation()">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="passCount" class="form-label fw-bold">Jumlah Lintasan (P):</label>
+                    <input type="number" id="passCount" class="form-control" value="1" step="1" onchange="updateCalculation()">
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="compactorDiameter" class="form-label fw-bold">Diameter Pemukul [m]:</label>
+                    <input type="number" id="compactorDiameter" class="form-control" value="1.6" step="0.1">
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-4">
+
+        <section class="mb-5 p-3 border rounded bg-light">
+            <h2 class="text-secondary border-bottom pb-2 mb-3">Tabel Referensi Empiris</h2>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h6 class="fw-bold text-center">Tabel 3.1 Koefisien $n$ (FHWA, 1995)</h6>
+                    <table class="table table-sm table-bordered table-ref">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Jenis Tanah</th>
+                                <th>Derajat Kejenuhan</th>
+                                <th>Nilai n (*)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah lolos air—tanah granular</td>
+                                <td>Tinggi</td>
+                                <td>0,5</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,5–0,6</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah agak lolos air—terutama lanau dengan indeks plastisitas $PI < 8$</td>
+                                <td>Tinggi</td>
+                                <td>0,35–0,4</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,4–0,5</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah kedap air—penyusun utama lanau dengan indeks plastisitas $PI > 8$.</td>
+                                <td>Tinggi</td>
+                                <td>Tidak direkomendasikan</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,35–0,40<br>(Tanah harus kadar air < batas plastis)</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                             <tr>
+                                <td colspan="3" class="small text-muted text-center">(*) Untuk energi yang diaplikasikan antara 1 sampai 3MJ/m^2 dan untuk pemukul dengan kabel tunggal dengan spool drum bebas</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <h6 class="fw-bold text-center">Tabel 3.3 Energi yang diaplikasikan (FHWA, 1986)</h6>
+                    <table class="table table-sm table-bordered table-ref">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Jenis lapisan tanah</th>
+                                <th>Energi satuan (kJ/m^3)</th>
+                                <th>Energi satuan terhadap standar Proctor (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tanah berbutir kasar lolos air</td>
+                                <td>200–250</td>
+                                <td>33–41</td>
+                            </tr>
+                            <tr>
+                                <td>Tanah berbutir halus semi lolos air</td>
+                                <td>250–350</td>
+                                <td>41–60</td>
+                            </tr>
+                            <tr>
+                                <td>Tempat pembuangan sampah material urugan (landfill)</td>
+                                <td>600–1100</td>
+                                <td>100–180</td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                             <tr>
+                                <td colspan="3" class="small text-muted text-center">
+                                    Catatan: 1 ton-meter/m^3 = 9,81 kJ/m^3; 1 MJ/m^3 = 1000 kJ/m^3.
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-4">
+
+        <div class="row g-4">
+            
+            <div class="col-lg-6">
+                <section class="card h-100 shadow-sm" id="area-a-section">
+                    <div class="card-header bg-warning text-dark">
+                        <h2 class="card-title h5 mb-0">2. Perhitungan Area A</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12 mb-3">
+                            <label for="appliedEnergyA" class="form-label small fw-bold">Energi (AE) [t.m/m²] (Hasil):</label>
+                            <input type="number" id="appliedEnergyA" class="form-control form-control-sm bg-light" value="0" step="1" readonly> 
+                            <span class="form-text">AE dihitung dari E \times D / 9,81.</span>
+                        </div>
+                        
+                        <button onclick="calculateAreaA()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area A</button> 
+                        <div class="alert alert-success mt-3" role="alert">
+                            <h3 class="h6 alert-heading">Hasil Area A:</h3>
+                            <ul class="list-unstyled mb-0">
+                                <li>Tinggi Jatuh Awal (H_Awal): <span class="fw-bold" id="H_initial_A">-</span> m</li>
+                                <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_A">-</span> m</li>
+                                <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_A">-</span> m</li>
+                                <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_A">-</span> pukulan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-lg-6">
+                <section class="card h-100 shadow-sm" id="area-b-section">
+                    <div class="card-header bg-info text-dark">
+                         <h2 class="card-title h5 mb-0">3. Perhitungan Area B</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12 mb-3">
+                            <label for="appliedEnergyB" class="form-label small fw-bold">Energi (AE) [t.m/m²] (Hasil):</label>
+                            <input type="number" id="appliedEnergyB" class="form-control form-control-sm bg-light" value="0" step="1" readonly>
+                            <span class="form-text">AE dihitung dari E \times D / 9,81.</span>
+                        </div>
+
+                        <button onclick="calculateAreaB()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area B</button>
+                        <div class="alert alert-primary mt-3" role="alert">
+                            <h3 class="h6 alert-heading">Hasil Area B:</h3>
+                            <ul class="list-unstyled mb-0">
+                                <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_B">-</span> m</li>
+                                <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_B">-</span> m</li>
+                                <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_B">-</span> pukulan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <section class="mb-5 p-3 border rounded bg-light-subtle">
+            <h2 class="text-secondary border-bottom pb-2 mb-3">4. Grid Pemadatan Dinamik</h2>
+            <p class="lead">Jarak titik pemadatan dinamis s saat ini: <span class="badge bg-danger fs-5" id="current-s">-</span> m</p>
+            
+            <div class="grid-container border border-2 border-dark position-relative d-flex justify-content-center align-items-center bg-white">
+                <div class="p-2 bg-warning-subtle border border-warning rounded position-absolute" style="bottom: 10%; right: 10%;">
+                    s = <span id="display-s" class="fw-bold">-</span> m
+                </div>
+            </div>
+            
+            <button onclick="downloadImage()" class="btn btn-secondary mt-3"><i class="bi bi-download"></i> Download Diagram (Opsional)</button>
+             </section>
+        
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="script.js"></script> 
+    
+    <script>
+        
+    </script>
+    </body>
+</html>
