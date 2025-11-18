@@ -64,10 +64,6 @@
                     </select>
                 </div>
                 
-                <div class="col-md-6">
-                    <label for="unitAppliedEnergy" class="form-label fw-bold">Energi Satuan (E) [kJ/m³]:</label>
-                    <input type="number" id="unitAppliedEnergy" class="form-control" value="800" step="10" onchange="updateCalculation()">
-                </div>
                 
                 <div class="col-md-4">
                     <label for="saturationLevel" class="form-label fw-bold">Derajat Kejenuhan/Kepadatan:</label>
@@ -89,12 +85,8 @@
                 </div>
                 
                 <div class="col-md-4">
-                    <label for="areaADepth" class="form-label fw-bold">Tebal Tanah Area A (D) [m]:</label>
+                    <label for="areaADepth" class="form-label fw-bold">Tebal Tanah Area (D) [m]:</label>
                     <input type="number" id="areaADepth" class="form-control" value="6.0" step="0.1" onchange="updateCalculation()">
-                </div>
-                <div class="col-md-4">
-                    <label for="areaBDepth" class="form-label fw-bold">Tebal Tanah Area B (D) [m]:</label>
-                    <input type="number" id="areaBDepth" class="form-control" value="3.50" step="0.1" onchange="updateCalculation()">
                 </div>
 
                 <div class="col-md-4">
@@ -204,10 +196,10 @@
 
         <div class="row g-4">
             
-            <div class="col-lg-6">
-                <section class="card h-100 shadow-sm" id="area-a-section">
+            <div class="col-12">
+                <section class="card shadow-sm" id="area-a-section">
                     <div class="card-header bg-warning text-dark">
-                        <h2 class="card-title h5 mb-0">2. Perhitungan Area A</h2>
+                        <h2 class="card-title h5 mb-0">2. Perhitungan Area </h2>
                     </div>
                     <div class="card-body">
                         <div class="col-12 mb-3">
@@ -224,31 +216,6 @@
                                 <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_A">-</span> m</li>
                                 <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_A">-</span> m</li>
                                 <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_A">-</span> pukulan</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="col-lg-6">
-                <section class="card h-100 shadow-sm" id="area-b-section">
-                    <div class="card-header bg-info text-dark">
-                         <h2 class="card-title h5 mb-0">3. Perhitungan Area B</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="col-12 mb-3">
-                            <label for="appliedEnergyB" class="form-label small fw-bold">Energi (AE) [t.m/m²] (Hasil):</label>
-                            <input type="number" id="appliedEnergyB" class="form-control form-control-sm bg-light" value="0" step="1" readonly>
-                            <span class="form-text">AE dihitung dari E \times D / 9,81.</span>
-                        </div>
-
-                        <button onclick="calculateAreaB()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area B</button>
-                        <div class="alert alert-primary mt-3" role="alert">
-                            <h3 class="h6 alert-heading">Hasil Area B:</h3>
-                            <ul class="list-unstyled mb-0">
-                                <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_B">-</span> m</li>
-                                <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_B">-</span> m</li>
-                                <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_B">-</span> pukulan</li>
                             </ul>
                         </div>
                     </div>
