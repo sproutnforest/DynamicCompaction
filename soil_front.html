@@ -75,11 +75,6 @@
                 </div>
 
                 <div class="col-md-4">
-                    <label for="empiricalConstant_n" class="form-label fw-bold">Koefisien Empiris (n):</label>
-                    <input type="number" id="empiricalConstant_n" class="form-control" value="0.4" step="0.01" onchange="updateCalculation()">
-                </div>
-
-                <div class="col-md-4">
                     <label for="compactorWeight" class="form-label fw-bold">Berat Pemukul (W) [ton]:</label>
                     <input type="number" id="compactorWeight" class="form-control" value="14" step="0.1" onchange="updateCalculation()">
                 </div>
@@ -107,7 +102,7 @@
             <h2 class="text-secondary border-bottom pb-2 mb-3">Tabel Referensi Empiris</h2>
             <div class="row">
                 <div class="col-lg-6 mb-4">
-                    <h6 class="fw-bold text-center">Tabel 3.1 Koefisien $n$ (FHWA, 1995)</h6>
+                    <h6 class="fw-bold text-center">Tabel 3.1 Koefisien n (FHWA, 1995)</h6>
                     <table class="table table-sm table-bordered table-ref">
                         <thead class="table-dark">
                             <tr>
@@ -127,7 +122,7 @@
                                 <td>0,5–0,6</td>
                             </tr>
                             <tr>
-                                <td rowspan="2">Lapisan tanah agak lolos air—terutama lanau dengan indeks plastisitas $PI < 8$</td>
+                                <td rowspan="2">Lapisan tanah agak lolos air—terutama lanau dengan indeks plastisitas PI < 8</td>
                                 <td>Tinggi</td>
                                 <td>0,35–0,4</td>
                             </tr>
@@ -136,7 +131,7 @@
                                 <td>0,4–0,5</td>
                             </tr>
                             <tr>
-                                <td rowspan="2">Lapisan tanah kedap air—penyusun utama lanau dengan indeks plastisitas $PI > 8$.</td>
+                                <td rowspan="2">Lapisan tanah kedap air—penyusun utama lanau dengan indeks plastisitas PI > 8.</td>
                                 <td>Tinggi</td>
                                 <td>Tidak direkomendasikan</td>
                             </tr>
@@ -208,9 +203,9 @@
                             <span class="form-text">AE dihitung dari E \times D / 9,81.</span>
                         </div>
                         
-                        <button onclick="calculateAreaA()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area A</button> 
+                        <button onclick="calculateAreaA()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area </button> 
                         <div class="alert alert-success mt-3" role="alert">
-                            <h3 class="h6 alert-heading">Hasil Area A:</h3>
+                            <h3 class="h6 alert-heading">Hasil Area:</h3>
                             <ul class="list-unstyled mb-0">
                                 <li>Tinggi Jatuh Awal (H_Awal): <span class="fw-bold" id="H_initial_A">-</span> m</li>
                                 <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_A">-</span> m</li>
