@@ -1,3 +1,4 @@
+let diagramDrawn = false;
 function calculateAreaA() {
     const soil = document.getElementById('soilType').value;
     const saturation = document.getElementById('saturationLevel').value;
@@ -89,6 +90,7 @@ function calculateAreaA() {
     }
 
     drawCompactionGrid(s);
+    diagramDrawn = true;
 }
 
 // A global variable to store the current 's' for redrawing
@@ -242,4 +244,48 @@ function drawCompactionGrid(sValue) {
 
     // Store the current sValue
     currentGridSpacing_s = sValue;
+}
+
+function downloadImage() {
+    const svgElement = document.getElementById('dynamicCompactionGrid');
+    
+    if (!diagramDrawn) {
+        alert("Diagram belum dibuat. Silakan hitung Area terlebih dahulu");
+        return;
+    }
+
+    const serializer = new XMLSerializer();
+    let svgString = serializer.serializeToString(svgElement);
+
+    const canvas = document.createElement('canvas');
+    const size = 600; 
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    
+    const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+    const url = URL.createObjectURL(svgBlob);
+
+    img.onload = function() {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, size, size);
+
+        ctx.drawImage(img, 0, 0, size, size);
+
+        const pngUrl = canvas.toDataURL("image/png");
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pngUrl;
+        downloadLink.download = 'diagram_pemadatan_dinamik.png';
+        
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        URL.revokeObjectURL(url);
+    };
+
+    // Trigger the load
+    img.src = url;
 }
