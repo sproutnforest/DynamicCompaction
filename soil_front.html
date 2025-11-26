@@ -219,6 +219,54 @@
 
         <hr class="my-4">
 
+        <div class="row g-4">
+            <div class="col-12">
+                <section class="card shadow-sm" id="spt-evaluation-section">
+                    <div class="card-header bg-info text-white">
+                        <h2 class="card-title h5 mb-0">3. Evaluasi Kinerja (Uji SPT Pasca-DC)</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="small text-muted">Masukkan data SPT yang diuji setelah Dynamic Compaction (DC) untuk memverifikasi kepadatan.</p>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="N_pre" class="form-label fw-bold">N-SPT Rata-rata Pra-DC:</label>
+                                <input type="number" id="N_pre" class="form-control" value="8" step="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="N_post" class="form-label fw-bold">N-SPT Rata-rata Pasca-DC:</label>
+                                <input type="number" id="N_post" class="form-control" value="18" step="1">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="MAT_depth" class="form-label small fw-bold">Kedalaman MAT (m):</label>
+                                <input type="number" id="MAT_depth" class="form-control form-control-sm" value="2.0" step="0.1">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="gamma_soil" class="form-label small fw-bold">Berat Isi Tanah Rata-rata (kN/m³):</label>
+                                <input type="number" id="gamma_soil" class="form-control form-control-sm" value="19.0" step="0.1">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="spt_efficiency" class="form-label small fw-bold">Efisiensi Bor (Er):</label>
+                                <input type="number" id="spt_efficiency" class="form-control form-control-sm" value="0.70" step="0.01">
+                            </div>
+                        </div>
+
+                        <button onclick="calculateSPTPerformance()" class="btn btn-info w-100 mt-2">Hitung Peningkatan Kepadatan N1</button>
+
+                        <div class="alert alert-primary mt-3" role="alert">
+                            <h3 class="h6 alert-heading">Hasil N-SPT Terkoreksi:</h3>
+                            <ul class="list-unstyled mb-0">
+                                <li>N1 Terkoreksi Pasca-DC (N1,post): <span class="fw-bold" id="N1_post_result">-</span></li>
+                                <li>Rasio Peningkatan (Npost/Npre): <span class="fw-bold" id="Improvement_Ratio">-</span></li>
+                                <li>Kesimpulan Kepadatan: <span class="fw-bold" id="SPT_Conclusion">-</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
         <section class="mb-5 p-3 border rounded bg-light-subtle">
             <h2 class="text-secondary border-bottom pb-2 mb-3">4. Grid Pemadatan Dinamik</h2>
             <p class="lead">Jarak titik pemadatan dinamis s saat ini: <span class="badge bg-danger fs-5" id="current-s">-</span> m</p>
