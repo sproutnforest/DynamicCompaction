@@ -16,46 +16,46 @@ function calculateAreaA() {
     let N; //jumlah pukulan
     if(soil === "wasteFill"){ //Tempat pembuangan sampah material urugan (landfill)
         if(saturation === "medium"){
-            n = 0.4;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.5): ", "0.4");
             e = 800;
         } else if(saturation === "high"){
-            n = 0.35;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.4): ", "0.35");
             e = 1100;
         } else {
-            n = 0.5;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.4 - 0.5): ", "0.5");
             e = 600;
         }
     } else if(soil === "granularCoarse"){ //Tanah berbutir kasar lolos air
         if(saturation === "medium"){
-            n = 0.5;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.5 - 0.6): ", "0.5");
             e = 225;
         } else if(saturation === "high"){
             n = 0.5;
             e = 250;
         } else {
-            n = 0.6;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.5 - 0.6): ", "0.6");
             e = 200;
         }
     } else if(soil === "granularFine"){//Tanah berbutir halus semi lolos air
         if(saturation === "medium"){
-            n = 0.4;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.4): ", "0.4");
             e = 300;
         } else if(saturation === "high"){
-            n = 0.35;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.4): ", "0.35");
             e = 350;
         } else {
-            n = 0.5;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.4 - 0.5): ", "0.5");
             e = 250;
         }
     } else{ //Lapisan tanah kedap air
         if(saturation === "medium"){
-            n = 0.35;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.4): ", "0.35");
             e = 800;
         } else if(saturation === "high"){
            alert("penggunaan jenis tanah ini tidak direkomendasikan!");
            return;
         } else {
-            n = 0.4;
+            n = prompt("Masukkan nilai koefisien n yang ingin digunakan (0.35 - 0.4): ", "0.4");
             e = 600;
         }
     };
