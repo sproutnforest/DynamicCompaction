@@ -441,3 +441,106 @@ function updateReferences() {
 function updateCalculation() {
     // Opsional: Bisa memanggil calculateAreaA() otomatis
 }
+
+// Fungsi Utama Kalkulasi SPT
+function calculateSPT() {
+    const targetDr = parseFloat(document.getElementById('spt_target_dr').value);
+    const efficiency = parseFloat(document.getElementById('spt_efficiency').value);
+    const waterTable = parseFloat(document.getElementById('water_table').value);
+    
+    // Ambil data baris tabel
+    const rows = document.querySelectorAll('#sptTable tbody tr');
+    let outputHtml = '';
+    
+    // Variabel akumulator untuk tegangan TOTAL
+    let cumulativeTotalSigma = 0; 
+    let prevDepth = 0;
+
+    // Konstanta empiris Skempton (1986): (N1)60 / Dr^2 ~= 60 (Pasir)
+    const Cp = 60; 
+
+    rows.forEach((row, index) => {
+        const start = parseFloat(row.querySelector('.layer-start').value);
+        const end = parseFloat(row.querySelector('.layer-end').value);
+        const gamma = parseFloat(row.querySelector('.layer-gamma').value);
+        const N_field = parseFloat(row.querySelector('.layer-n').value);
+
+        if (isNaN(start) || isNaN(end) || isNaN(gamma) || isNaN(N_field)) {
+            return; // Skip baris kosong/invalid
+        }
+
+        // 1. Titik Tinjau (Midpoint)
+        const midDepth = (start + end) / 2;
+        const layerThickness = end - start;
+
+        // 2. Hitung Tegangan Vertikal TOTAL (Sigma_v) di titik tengah
+        // Sigma_v = Akumulasi lapisan di atasnya + Berat lapisan ini sampai tengah
+        const sigmaTotalAtMid = cumulativeTotalSigma + (gamma * (midDepth - prevDepth));
+
+        // 3. Hitung Tekanan Air Pori (u) di titik tengah
+        // u = (Kedalaman titik - Muka Air Tanah) * 9.81
+        let u = 0;
+        if (midDepth > waterTable) {
+            u = (midDepth - waterTable) * 9.81;
+        }
+
+        // 4. Hitung Tegangan Vertikal EFEKTIF (Sigma'_v)
+        // Sigma'v = Sigma_v - u
+        let sigmaEff = sigmaTotalAtMid - u;
+        
+        // Safety check: Tegangan efektif tidak boleh 0 atau negatif (untuk pembagi Cn)
+        if (sigmaEff <= 0) sigmaEff = 0.1; 
+
+        // --- Update Akumulator untuk lapisan berikutnya (sampai dasar lapisan ini) ---
+        cumulativeTotalSigma += gamma * layerThickness;
+        prevDepth = end;
+
+        // 5. Koreksi Overburden (Cn)
+        // Cn = sqrt(100 / sigma'v), batasi max 1.7
+        let Cn = Math.sqrt(100 / sigmaEff);
+        if (Cn > 1.7) Cn = 1.7;
+
+        // 6. Koreksi Energi (Ce) -> N60
+        const N60 = N_field * (efficiency / 60);
+
+        // 7. Hitung (N1)60
+        const N1_60 = N60 * Cn;
+
+        // 8. Hitung Relative Density (Dr)
+        // Dr = sqrt( (N1)60 / Cp ) * 100
+        let Dr = Math.sqrt(N1_60 / Cp) * 100;
+        if(Dr > 100) Dr = 100;
+
+        // Evaluasi Status
+        const isPass = Dr >= targetDr;
+        const statusBadge = isPass 
+            ? '<span class="badge bg-success">Memenuhi</span>' 
+            : '<span class="badge bg-danger">Tidak Memenuhi</span>';
+
+        // Format Angka (Rounding)
+        const sigmaV_disp = Math.round(sigmaTotalAtMid * 100) / 100;
+        const u_disp = Math.round(u * 100) / 100;
+        const sigmaEff_disp = Math.round(sigmaEff * 100) / 100;
+        Cn = Math.round(Cn * 100) / 100;
+        const N1_60_rounded = Math.round(N1_60 * 10) / 10;
+        Dr = Math.round(Dr * 10) / 10;
+
+        // Generate HTML Row
+        outputHtml += `
+            <tr>
+                <td>${midDepth.toFixed(1)}</td>
+                <td>${sigmaV_disp}</td>
+                <td class="text-primary">${u_disp}</td>
+                <td class="fw-bold">${sigmaEff_disp}</td>
+                <td>${Cn}</td>
+                <td>${N1_60_rounded}</td>
+                <td class="fw-bold">${Dr}</td>
+                <td>${statusBadge}</td>
+            </tr>
+        `;
+    });
+
+    document.getElementById('spt_result_body').innerHTML = outputHtml;
+    document.getElementById('spt_result_container').style.display = 'block';
+    document.getElementById('spt_result_container').scrollIntoView({ behavior: 'smooth' });
+}

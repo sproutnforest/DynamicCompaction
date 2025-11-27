@@ -1,317 +1,402 @@
 <!DOCTYPE html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Perhitungan Dynamic Compaction</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perhitungan Dynamic Compaction</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; 
+            line-height: 1.6;
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .grid-container {
+            /* Area visualisasi grid */
+            min-height: 300px;
+            position: relative;
+            overflow: hidden; 
+            background-color: #f0f0f0; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
         
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        .form-label.small {
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .table-ref th, .table-ref td {
+            vertical-align: middle;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container my-5 p-4 bg-white rounded shadow-lg">
+        <h1 class="text-center text-primary mb-4 pb-2 border-bottom border-primary">Perancangan Program Dynamic Compaction</h1>
 
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                background-color: #f8f9fa; 
-                line-height: 1.6;
-                padding-top: 30px;
-                padding-bottom: 30px;
-            }
-
-            .container {
-                max-width: 900px;
-            }
-
-            .grid-container {
-                /* Area visualisasi grid */
-                min-height: 300px;
-                position: relative;
-                overflow: hidden; 
-                background-color: #f0f0f0; 
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 1.2rem;
-                color: #6c757d;
-            }
+        <section class="mb-5 p-3 border rounded">
+            <h2 class="text-info border-bottom pb-2 mb-3">1. Pra-Kalkulasi: Kepadatan Relatif (Dr)</h2>
+            <p class="small text-muted">Gunakan bagian ini untuk menentukan kondisi awal tanah (Loose/Dense) berdasarkan data laboratorium.</p>
             
-            .form-label.small {
-                font-size: 0.85rem;
-                margin-bottom: 0.2rem;
-            }
-            
-            .table-ref th, .table-ref td {
-                vertical-align: middle;
-                font-size: 0.8rem;
-            }
-        </style>
-    </head>
-    <body class="bg-light">
-        <div class="container my-5 p-4 bg-white rounded shadow-lg">
-            <h1 class="text-center text-primary mb-4 pb-2 border-bottom border-primary">Perancangan Program Dynamic Compaction</h1>
-
-            <section class="mb-5 p-3 border rounded">
-                <h2 class="text-info border-bottom pb-2 mb-3">1. Pra-Kalkulasi: Kepadatan Relatif (Dr)</h2>
-                <p class="small text-muted">Gunakan bagian ini untuk menentukan kondisi awal tanah (Loose/Dense) berdasarkan data laboratorium.</p>
-                
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <h4 class="h6 fw-bold">A. Berdasarkan Angka Pori (Void Ratio, e)</h4>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="e_max" class="form-control" value="0.8" step="0.01">
-                            <label for="e_max" class="form-label small">Angka Pori Maksimum (e_max)</label>
-                        </div>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="e_min" class="form-control" value="0.4" step="0.01">
-                            <label for="e_min" class="form-label small">Angka Pori Minimum (e_min)</label>
-                        </div>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="e_field" class="form-control" value="0.75" step="0.01">
-                            <label for="e_field" class="form-label small">Angka Pori Lapangan (e)</label>
-                        </div>
-                        <button onclick="calculateDr('voidRatio')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Angka Pori)</button>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <h4 class="h6 fw-bold">A. Berdasarkan Angka Pori (Void Ratio, e)</h4>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="e_max" class="form-control" value="0.8" step="0.01">
+                        <label for="e_max" class="form-label small">Angka Pori Maksimum (e_max)</label>
                     </div>
-
-                    <div class="col-md-6">
-                        <h4 class="h6 fw-bold">B. Berdasarkan Berat Isi Kering (Dry Unit Weight)</h4>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="gamma_d_min" class="form-control" value="14.5" step="0.1">
-                            <label for="gamma_d_min" class="form-label small">Berat Isi Kering Paling Longgar (gamma_d(min)) [kN/m³]</label>
-                        </div>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="gamma_d_max" class="form-control" value="18.5" step="0.1">
-                            <label for="gamma_d_max" class="form-label small">Berat Isi Kering Paling Padat (gamma_d(max)) [kN/m³]</label>
-                        </div>
-                        <div class="form-floating mb-2">
-                            <input type="number" id="gamma_field" class="form-control" value="15.0" step="0.1">
-                            <label for="gamma_field" class="form-label small">Berat Isi Kering Lapangan (gamma_d) [kN/m³]</label>
-                        </div>
-                        <button onclick="calculateDr('dryUnitWeight')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Berat Isi Kering)</button>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="e_min" class="form-control" value="0.4" step="0.01">
+                        <label for="e_min" class="form-label small">Angka Pori Minimum (e_min)</label>
                     </div>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="e_field" class="form-control" value="0.75" step="0.01">
+                        <label for="e_field" class="form-label small">Angka Pori Lapangan (e)</label>
+                    </div>
+                    <button onclick="calculateDr('voidRatio')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Angka Pori)</button>
                 </div>
-                
-                <div class="alert alert-info mt-3" role="alert">
-                    <h3 class="h6 alert-heading mb-1">Hasil Kepadatan Relatif Awal (Dr Awal): 
-                        <span class="fw-bold" id="Dr_initial_result">-</span>
-                    </h3>
-                    <p class="mb-0">Klasifikasi Kepadatan: <span class="fw-bold" id="Dr_initial_classification">-</span></p>
-                </div>
-                
-                <h6 class="fw-bold text-center mt-4">Tabel Klasifikasi Kepadatan Relatif</h6>
-                <table class="table table-sm table-bordered table-ref text-center">
-                    <thead class="table-dark">
-                        <tr><th>Relative Density (%)</th><th>Classification</th></tr>
-                    </thead>
-                    <tbody>
-                        <tr><td> < 15</td><td>Very Loose</td></tr>
-                        <tr><td>15 - 35</td><td>Loose</td></tr>
-                        <tr><td>35 - 65</td><td>Medium dense</td></tr>
-                        <tr><td>65 - 85</td><td>Dense</td></tr>
-                        <tr><td>> 85</td><td>Very Dense</td></tr>
-                    </tbody>
-                </table>
-            </section>
 
-            <hr class="my-4">
-
-            <section class="mb-5 p-3 border rounded bg-light">
-                <h2 class="text-secondary border-bottom pb-2 mb-3">Tabel Referensi Empiris</h2>
-                <div class="row">
-                    <div class="col-lg-6 mb-4">
-                        <h6 class="fw-bold text-center">Tabel 3.1 Koefisien n (FHWA, 1995)</h6>
-                        <table class="table table-sm table-bordered table-ref">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Jenis Tanah</th>
-                                    <th>Derajat Kejenuhan</th>
-                                    <th>Nilai n (*)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td rowspan="2">Lapisan tanah lolos air—tanah granular</td>
-                                    <td>Tinggi</td>
-                                    <td>0,5</td>
-                                </tr>
-                                <tr>
-                                    <td>Rendah</td>
-                                    <td>0,5–0,6</td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="2">Lapisan tanah agak lolos air...</td>
-                                    <td>Tinggi</td>
-                                    <td>0,35–0,4</td>
-                                </tr>
-                                <tr>
-                                    <td>Rendah</td>
-                                    <td>0,4–0,5</td>
-                                </tr>
-                                <tr>
-                                    <td rowspan="2">Lapisan tanah kedap air...</td>
-                                    <td>Tinggi</td>
-                                    <td>Tidak direkomendasikan</td>
-                                </tr>
-                                <tr>
-                                    <td>Rendah</td>
-                                    <td>0,35–0,40</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="col-md-6">
+                    <h4 class="h6 fw-bold">B. Berdasarkan Berat Isi Kering (Dry Unit Weight)</h4>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="gamma_d_min" class="form-control" value="14.5" step="0.1">
+                        <label for="gamma_d_min" class="form-label small">Berat Isi Kering Paling Longgar (gamma_d(min)) [kN/m³]</label>
                     </div>
-
-                    <div class="col-lg-6 mb-4">
-                        <h6 class="fw-bold text-center">Tabel 3.3 Energi yang diaplikasikan</h6>
-                        <table class="table table-sm table-bordered table-ref">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Jenis lapisan tanah</th>
-                                    <th>Energi satuan (kJ/m^3)</th>
-                                    <th>% thd Proctor</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Tanah berbutir kasar lolos air</td>
-                                    <td>200–250</td>
-                                    <td>33–41</td>
-                                </tr>
-                                <tr>
-                                    <td>Tanah berbutir halus semi lolos air</td>
-                                    <td>250–350</td>
-                                    <td>41–60</td>
-                                </tr>
-                                <tr>
-                                    <td>Tempat pembuangan sampah (landfill)</td>
-                                    <td>600–1100</td>
-                                    <td>100–180</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="gamma_d_max" class="form-control" value="18.5" step="0.1">
+                        <label for="gamma_d_max" class="form-label small">Berat Isi Kering Paling Padat (gamma_d(max)) [kN/m³]</label>
                     </div>
-                </div>
-            </section>
-
-            <hr class="my-4">
-
-            <section class="mb-5 p-3 border rounded">
-                <h2 class="text-success border-bottom pb-2 mb-3">2. Parameter Desain & Input Dasar</h2>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="soilType" class="form-label fw-bold">Jenis Lapisan Tanah:</label>
-                        <select id="soilType" class="form-select" onchange="updateReferences()"> 
-                            <option value="wasteFill" selected>Tempat Pembuangan Sampah/Urugan</option>
-                            <option value="granularCoarse">Tanah berbutir kasar lolos air</option>
-                            <option value="granularFine">Tanah berbutir halus semi lolos air</option>
-                            <option value="siltyPIGreater8">Lapisan tanah kedap air</option>
-                        </select>
+                    <div class="form-floating mb-2">
+                        <input type="number" id="gamma_field" class="form-control" value="15.0" step="0.1">
+                        <label for="gamma_field" class="form-label small">Berat Isi Kering Lapangan (gamma_d) [kN/m³]</label>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <label for="saturationLevel" class="form-label fw-bold">Derajat Kejenuhan/Kepadatan:</label>
-                        <select id="saturationLevel" class="form-select" onchange="updateReferences()">
-                            <option value="medium" selected>Sedang (Landfill)</option>
-                            <option value="high">Tinggi</option>
-                            <option value="low">Rendah</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="compactorWeight" class="form-label fw-bold">Berat Pemukul (W) [ton]:</label>
-                        <input type="number" id="compactorWeight" class="form-control" value="14" step="0.1">
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <label for="areaADepth" class="form-label fw-bold">Tebal Tanah Area (D) [m]:</label>
-                        <input type="number" id="areaADepth" class="form-control" value="6.0" step="0.1">
-                    </div>
-
-                    <div class="col-md-4">
-                        <label for="passCount" class="form-label fw-bold">Jumlah Lintasan (P):</label>
-                        <input type="number" id="passCount" class="form-control" value="1" step="1">
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <label for="compactorDiameter" class="form-label fw-bold">Diameter Pemukul [m]:</label>
-                        <input type="number" id="compactorDiameter" class="form-control" value="1.6" step="0.1">
-                    </div>
-                </div>
-            </section>
-
-            <div class="row g-4">
-                <div class="col-12">
-                    <section class="card shadow-sm" id="area-a-section">
-                        <div class="card-header bg-warning text-dark">
-                            <h2 class="card-title h5 mb-0">3. Hasil Perhitungan Parameter Operasional</h2>
-                        </div>
-                        <div class="card-body">
-                            <div class="col-12 mb-3">
-                                <label for="appliedEnergyA" class="form-label small fw-bold">Energi (AE) [t.m/m²] (Hasil):</label>
-                                <input type="number" id="appliedEnergyA" class="form-control form-control-sm bg-light" value="0" step="1" readonly> 
-                                <span class="form-text">AE dihitung dari E × D / 9,81.</span>
-                            </div>
-                            
-                            <button onclick="calculateAreaA()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area </button> 
-                            <div class="alert alert-success mt-3" role="alert">
-                                <h3 class="h6 alert-heading">Hasil Area:</h3>
-                                <ul class="list-unstyled mb-0">
-                                    <li>Tinggi Jatuh Awal (H_Awal): <span class="fw-bold" id="H_initial_A">-</span> m</li>
-                                    <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_A">-</span> m</li>
-                                    <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_A">-</span> m</li>
-                                    <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_A">-</span> pukulan</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <hr class="my-4">
-
-            <section class="mb-5 p-3 border rounded bg-light-subtle">
-                <h2 class="text-secondary border-bottom pb-2 mb-3">4. Visualisasi Grid Pemadatan</h2>
-                <p class="lead">Jarak titik pemadatan dinamis s saat ini: <span class="badge bg-danger fs-5" id="current-s">-</span> m</p>
-                
-                <div class="grid-container border border-2 border-dark position-relative d-flex justify-content-center align-items-center bg-white" id="dynamicGridContainer">
-                    <svg id="dynamicCompactionGrid" width="100%" height="100%" viewBox="0 0 300 300"></svg>
-                </div>
-                
-                <button onclick="downloadImage()" class="btn btn-secondary mt-3"><i class="bi bi-download"></i> Download Diagram </button>
-            </section>
-
-            <hr class="my-4">
-
-            <div class="row"> <div class="col-12">
-                    <section class="card shadow-sm" id="evaluation-section">
-                        <div class="card-header bg-success text-white">
-                            <h2 class="card-title h5 mb-0">5. Prediksi Target Kepadatan Akhir</h2>
-                        </div>
-                        <div class="card-body">
-                            <p class="small text-muted">Asumsikan Dynamic Compaction berhasil meningkatkan Kepadatan Relatif ke nilai target.</p>
-
-                            <div class="row g-3 mb-3">
-                                <div class="col-md-6">
-                                    <label for="Dr_target" class="form-label fw-bold">Target Kepadatan Relatif (Dr Target) [%]:</label>
-                                    <input type="number" id="Dr_target" class="form-control" value="70" step="1">
-                                    <span class="form-text">Nilai Dr yang diinginkan setelah pemadatan.</span>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="gamma_d_after" class="form-label fw-bold">Berat Isi Kering Setelah Kompaksi (gamma_d Akhir) [kN/m³]:</label>
-                                    <input type="number" id="gamma_d_after" class="form-control form-control-sm bg-light" value="0" step="0.1" readonly>
-                                    <span class="form-text">Nilai gamma_d yang sesuai dengan (Dr Target).</span>
-                                </div>
-                            </div>
-                            <button onclick="calculateTargetGammaD()" class="btn btn-success w-100">Hitung gamma_d Akhir</button>
-                            <div class="alert alert-warning mt-3" role="alert">
-                                <h3 class="h6 alert-heading">Kesimpulan:</h3>
-                                <p id="compaction_conclusion" class="mb-0">Tekan tombol di atas untuk melihat target berat isi kering setelah pemadatan.</p>
-                            </div>
-                        </div>
-                    </section>
+                    <button onclick="calculateDr('dryUnitWeight')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Berat Isi Kering)</button>
                 </div>
             </div>
             
+            <div class="alert alert-info mt-3" role="alert">
+                <h3 class="h6 alert-heading mb-1">Hasil Kepadatan Relatif Awal (Dr Awal): 
+                    <span class="fw-bold" id="Dr_initial_result">-</span>
+                </h3>
+                <p class="mb-0">Klasifikasi Kepadatan: <span class="fw-bold" id="Dr_initial_classification">-</span></p>
+            </div>
+            
+            <h6 class="fw-bold text-center mt-4">Tabel Klasifikasi Kepadatan Relatif</h6>
+            <table class="table table-sm table-bordered table-ref text-center">
+                <thead class="table-dark">
+                    <tr><th>Relative Density (%)</th><th>Classification</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td> < 15</td><td>Very Loose</td></tr>
+                    <tr><td>15 - 35</td><td>Loose</td></tr>
+                    <tr><td>35 - 65</td><td>Medium dense</td></tr>
+                    <tr><td>65 - 85</td><td>Dense</td></tr>
+                    <tr><td>> 85</td><td>Very Dense</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <hr class="my-4">
+
+        <section class="mb-5 p-3 border rounded bg-light">
+            <h2 class="text-secondary border-bottom pb-2 mb-3">Tabel Referensi Empiris</h2>
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h6 class="fw-bold text-center">Tabel 3.1 Koefisien n (FHWA, 1995)</h6>
+                    <table class="table table-sm table-bordered table-ref">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Jenis Tanah</th>
+                                <th>Derajat Kejenuhan</th>
+                                <th>Nilai n (*)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah lolos air—tanah granular</td>
+                                <td>Tinggi</td>
+                                <td>0,5</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,5–0,6</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah agak lolos air...</td>
+                                <td>Tinggi</td>
+                                <td>0,35–0,4</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,4–0,5</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="2">Lapisan tanah kedap air...</td>
+                                <td>Tinggi</td>
+                                <td>Tidak direkomendasikan</td>
+                            </tr>
+                            <tr>
+                                <td>Rendah</td>
+                                <td>0,35–0,40</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <h6 class="fw-bold text-center">Tabel 3.3 Energi yang diaplikasikan</h6>
+                    <table class="table table-sm table-bordered table-ref">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Jenis lapisan tanah</th>
+                                <th>Energi satuan (kJ/m^3)</th>
+                                <th>% thd Proctor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tanah berbutir kasar lolos air</td>
+                                <td>200–250</td>
+                                <td>33–41</td>
+                            </tr>
+                            <tr>
+                                <td>Tanah berbutir halus semi lolos air</td>
+                                <td>250–350</td>
+                                <td>41–60</td>
+                            </tr>
+                            <tr>
+                                <td>Tempat pembuangan sampah (landfill)</td>
+                                <td>600–1100</td>
+                                <td>100–180</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-4">
+
+        <section class="mb-5 p-3 border rounded">
+            <h2 class="text-success border-bottom pb-2 mb-3">2. Parameter Desain & Input Dasar</h2>
+            <div class="row g-3">git 
+                <div class="col-md-6">
+                    <label for="soilType" class="form-label fw-bold">Jenis Lapisan Tanah:</label>
+                    <select id="soilType" class="form-select" onchange="updateReferences()"> 
+                        <option value="wasteFill" selected>Tempat Pembuangan Sampah/Urugan</option>
+                        <option value="granularCoarse">Tanah berbutir kasar lolos air</option>
+                        <option value="granularFine">Tanah berbutir halus semi lolos air</option>
+                        <option value="siltyPIGreater8">Lapisan tanah kedap air</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="saturationLevel" class="form-label fw-bold">Derajat Kejenuhan/Kepadatan:</label>
+                    <select id="saturationLevel" class="form-select" onchange="updateReferences()">
+                        <option value="medium" selected>Sedang (Landfill)</option>
+                        <option value="high">Tinggi</option>
+                        <option value="low">Rendah</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="compactorWeight" class="form-label fw-bold">Berat Pemukul (W) [ton]:</label>
+                    <input type="number" id="compactorWeight" class="form-control" value="14" step="0.1">
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="areaADepth" class="form-label fw-bold">Tebal Tanah Area (D) [m]:</label>
+                    <input type="number" id="areaADepth" class="form-control" value="6.0" step="0.1">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="passCount" class="form-label fw-bold">Jumlah Lintasan (P):</label>
+                    <input type="number" id="passCount" class="form-control" value="1" step="1">
+                </div>
+                
+                <div class="col-md-4">
+                    <label for="compactorDiameter" class="form-label fw-bold">Diameter Pemukul [m]:</label>
+                    <input type="number" id="compactorDiameter" class="form-control" value="1.6" step="0.1">
+                </div>
+            </div>
+        </section>
+
+        <div class="row g-4">
+            <div class="col-12">
+                <section class="card shadow-sm" id="area-a-section">
+                    <div class="card-header bg-warning text-dark">
+                        <h2 class="card-title h5 mb-0">3. Hasil Perhitungan Parameter Operasional</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="col-12 mb-3">
+                            <label for="appliedEnergyA" class="form-label small fw-bold">Energi (AE) [t.m/m²] (Hasil):</label>
+                            <input type="number" id="appliedEnergyA" class="form-control form-control-sm bg-light" value="0" step="1" readonly> 
+                            <span class="form-text">AE dihitung dari E × D / 9,81.</span>
+                        </div>
+                        
+                        <button onclick="calculateAreaA()" class="btn btn-primary w-100 mb-3">Hitung Ketinggian & Pukulan Area </button> 
+                        <div class="alert alert-success mt-3" role="alert">
+                            <h3 class="h6 alert-heading">Hasil Area:</h3>
+                            <ul class="list-unstyled mb-0">
+                                <li>Tinggi Jatuh Awal (H_Awal): <span class="fw-bold" id="H_initial_A">-</span> m</li>
+                                <li>Tinggi Jatuh Rencana (H): <span class="fw-bold" id="H_planned_A">-</span> m</li>
+                                <li>Jarak Titik Pemadatan (s): <span class="fw-bold" id="s_A">-</span> m</li>
+                                <li>Jumlah Pukulan/Titik (N): <span class="fw-bold" id="N_A">-</span> pukulan</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </div>
+
+        <hr class="my-4">
+
+        <section class="mb-5 p-3 border rounded bg-light-subtle">
+            <h2 class="text-secondary border-bottom pb-2 mb-3">4. Visualisasi Grid Pemadatan</h2>
+            <p class="lead">Jarak titik pemadatan dinamis s saat ini: <span class="badge bg-danger fs-5" id="current-s">-</span> m</p>
+            
+            <div class="grid-container border border-2 border-dark position-relative d-flex justify-content-center align-items-center bg-white" id="dynamicGridContainer">
+                <svg id="dynamicCompactionGrid" width="100%" height="100%" viewBox="0 0 300 300"></svg>
+            </div>
+            
+            <button onclick="downloadImage()" class="btn btn-secondary mt-3"><i class="bi bi-download"></i> Download Diagram </button>
+        </section>
+
+        <hr class="my-4">
+
+        <div class="row"> <div class="col-12">
+                <section class="card shadow-sm" id="evaluation-section">
+                    <div class="card-header bg-success text-white">
+                        <h2 class="card-title h5 mb-0">5. Prediksi Target Kepadatan Akhir</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="small text-muted">Asumsikan Dynamic Compaction berhasil meningkatkan Kepadatan Relatif ke nilai target.</p>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="Dr_target" class="form-label fw-bold">Target Kepadatan Relatif (Dr Target) [%]:</label>
+                                <input type="number" id="Dr_target" class="form-control" value="70" step="1">
+                                <span class="form-text">Nilai Dr yang diinginkan setelah pemadatan.</span>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gamma_d_after" class="form-label fw-bold">Berat Isi Kering Setelah Kompaksi (gamma_d Akhir) [kN/m³]:</label>
+                                <input type="number" id="gamma_d_after" class="form-control form-control-sm bg-light" value="0" step="0.1" readonly>
+                                <span class="form-text">Nilai gamma_d yang sesuai dengan (Dr Target).</span>
+                            </div>
+                        </div>
+                        <button onclick="calculateTargetGammaD()" class="btn btn-success w-100">Hitung gamma_d Akhir</button>
+                        <div class="alert alert-warning mt-3" role="alert">
+                            <h3 class="h6 alert-heading">Kesimpulan:</h3>
+                            <p id="compaction_conclusion" class="mb-0">Tekan tombol di atas untuk melihat target berat isi kering setelah pemadatan.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <hr class="my-4">
+
+        <section class="card shadow-sm border-primary" id="spt-section">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h5 mb-0">6. Evaluasi Hasil SPT (Post-Compaction)</h2>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">Masukkan data pengujian SPT untuk mengevaluasi apakah target kepadatan relatif (Dr) tercapai.</p>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Target Dr (%):</label>
+                        <input type="number" id="spt_target_dr" class="form-control form-control-sm" value="65" step="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Efisiensi Energi SPT (%):</label>
+                        <input type="number" id="spt_efficiency" class="form-control form-control-sm" value="70" placeholder="Contoh: 60 atau 70">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold small">Muka Air Tanah (m):</label>
+                        <input type="number" id="water_table" class="form-control form-control-sm" value="10">
+                    </div>
+                </div>
+
+                <h6 class="fw-bold">Data Per Lapisan Kedalaman</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm text-center align-middle" id="sptTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="15%">Kedalaman Awal (m)</th>
+                                <th width="15%">Kedalaman Akhir (m)</th>
+                                <th width="20%">Berat Isi (&gamma;) [kN/m³]</th>
+                                <th width="20%">N-SPT Rata-rata</th>
+                                <th width="10%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="number" class="form-control form-control-sm layer-start" value="0"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-end" value="3"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-gamma" value="12.5"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-n" value="35"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeSptRow(this)">X</button></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" class="form-control form-control-sm layer-start" value="3"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-end" value="6"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-gamma" value="18"></td>
+                                <td><input type="number" class="form-control form-control-sm layer-n" value="40"></td>
+                                <td><button class="btn btn-danger btn-sm" onclick="removeSptRow(this)">X</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn btn-sm btn-outline-primary mb-3" onclick="addSptRow()">+ Tambah Lapisan</button>
+
+                <button onclick="calculateSPT()" class="btn btn-primary w-100">Hitung Evaluasi SPT</button>
+
+                <div id="spt_result_container" class="mt-4" style="display:none;">
+                    <h6 class="fw-bold border-bottom pb-2">Hasil Analisis:</h6>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm text-center small">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Depth (m)</th>
+                                    <th>&sigma;v Total (kPa)</th> <th>u (Air) (kPa)</th>      <th>&sigma;'v Efektif (kPa)</th>
+                                    <th>Cn</th>
+                                    <th>(N1)60</th>
+                                    <th>Dr (%)</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spt_result_body">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div class="alert alert-info py-2 small">
+                        <strong>Rumus:</strong> Dr = &radic;((N1)<sub>60</sub> / C<sub>p</sub>) * 100. (Asumsi C<sub>p</sub>=60).<br>
+                        &sigma;'v = &sigma;v - u. <br>
+                        (N1)<sub>60</sub> = N<sub>lap</sub> * (Eff/60) * C<sub>N</sub>.
+                    </div>
+                </div>     
+            </div>
+        </section>
         
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-        
-        <script src="js/script.js"></script> 
-    </body>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script src="js/script.js"></script> 
+</body>
 </html>
