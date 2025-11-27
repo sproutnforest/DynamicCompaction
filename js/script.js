@@ -442,6 +442,26 @@ function updateCalculation() {
     // Opsional: Bisa memanggil calculateAreaA() otomatis
 }
 
+// BAGIAN 6: FUNGSI EVALUASI SPT
+// Menambah baris input baru ke tabel
+function addSptRow() {
+    const table = document.getElementById('sptTable').getElementsByTagName('tbody')[0];
+    const newRow = table.insertRow();
+    newRow.innerHTML = `
+        <td><input type="number" class="form-control form-control-sm layer-start"></td>
+        <td><input type="number" class="form-control form-control-sm layer-end"></td>
+        <td><input type="number" class="form-control form-control-sm layer-gamma"></td>
+        <td><input type="number" class="form-control form-control-sm layer-n"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="removeSptRow(this)">X</button></td>
+    `;
+}
+
+// Menghapus baris input
+function removeSptRow(btn) {
+    const row = btn.parentNode.parentNode;
+    row.parentNode.removeChild(row);
+}
+
 // Fungsi Utama Kalkulasi SPT
 function calculateSPT() {
     const targetDr = parseFloat(document.getElementById('spt_target_dr').value);
