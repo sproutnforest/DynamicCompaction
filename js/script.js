@@ -1,3 +1,100 @@
+// BAGIAN 1: PERHITUNGAN KEPADATAN RELATIF (Dr)
+function calculateDr(method) {
+    // 1. Ambil metode perhitungan yang dipilih user (Void Ratio atau Unit Weight)
+    let Dr = 0;
+    let classification = "";
+    
+    try {
+        if (method === "voidRatio") {
+            // Ambil input Angka Pori
+            const e_max = parseFloat(document.getElementById('e_max').value);
+            const e_min = parseFloat(document.getElementById('e_min').value);
+            const e_field = parseFloat(document.getElementById('e_field').value);
+
+            // Validasi Input
+            if (isNaN(e_max) || isNaN(e_min) || isNaN(e_field)) {
+                alert("Mohon isi semua nilai Angka Pori dengan angka valid.");
+                return;
+            }
+            if (e_min >= e_max) {
+                alert("Nilai e_min harus lebih kecil dari e_max.");
+                return;
+            }
+            if (e_field > e_max || e_field < e_min) {
+                alert("Nilai e_lapangan harus berada di antara e_min dan e_max.");
+                return;
+            }
+
+            // Rumus Dr berdasarkan Void Ratio
+            Dr = ((e_max - e_field) / (e_max - e_min)) * 100;
+
+        } else if (method === "dryUnitWeight") {
+            // Ambil input Berat Isi Kering (gamma)
+            const gamma_d_min = parseFloat(document.getElementById('gamma_d_min').value);
+            const gamma_d_max = parseFloat(document.getElementById('gamma_d_max').value);
+            const gamma_d_field = parseFloat(document.getElementById('gamma_field').value);
+
+            // Validasi Input
+            if (isNaN(gamma_d_min) || isNaN(gamma_d_max) || isNaN(gamma_d_field)) {
+                alert("Mohon isi semua nilai Berat Isi dengan angka valid.");
+                return;
+            }
+            if (gamma_d_min >= gamma_d_max) {
+                alert("Nilai gamma_min harus lebih kecil dari gamma_max.");
+                return;
+            }
+            // Validasi logis tanah (tidak wajib error, tapi peringatan)
+            if (gamma_d_field < gamma_d_min || gamma_d_field > gamma_d_max) {
+                console.warn("Berat isi lapangan berada di luar rentang min/max laboratorium.");
+            }
+
+            // Rumus Dr berdasarkan Unit Weight
+            // Dr = [ (gd - gd_min) / (gd_max - gd_min) ] * [ gd_max / gd ] * 100
+            Dr = ((gamma_d_field - gamma_d_min) / (gamma_d_max - gamma_d_min)) * (gamma_d_max / gamma_d_field) * 100;
+        }
+
+        // Pembulatan hasil 2 desimal
+        Dr = Math.round(Dr * 100) / 100;
+
+        // Tentukan Klasifikasi
+        if (Dr < 0) classification = "Error (Data tidak valid)";
+        else if (Dr <= 15) classification = "Sangat Lepas (Very Loose)";
+        else if (Dr <= 35) classification = "Lepas (Loose)";
+        else if (Dr <= 65) classification = "Sedang (Medium Dense)";
+        else if (Dr <= 85) classification = "Padat (Dense)";
+        else if (Dr <= 100) classification = "Sangat Padat (Very Dense)";
+        else classification = "Error (> 100%)";
+
+        // Tampilkan Hasil
+        document.getElementById('Dr_initial_result').innerText = Dr + " %";
+        document.getElementById('Dr_initial_classification').innerText = classification;
+
+        // Otomatis update dropdown "Derajat Kejenuhan" di Bagian 2
+        autoSelectSaturation(Dr)
+
+    } catch (error) {
+        console.error("Error calculating Dr:", error);
+        alert("Terjadi kesalahan perhitungan.");
+    }
+}
+
+// Fungsi Helper: Mengubah dropdown "Derajat Kejenuhan" secara otomatis berdasarkan hasil Dr
+function autoSelectSaturation(drValue) {
+    const saturationSelect = document.getElementById('saturationLevel');
+    if (!saturationSelect) return;
+
+    if (drValue < 35) {
+        saturationSelect.value = "low"; // Loose
+    } else if (drValue <= 65) {
+        saturationSelect.value = "medium"; // Medium
+    } else {
+        saturationSelect.value = "high"; // Dense
+    }
+    // Trigger event agar fungsi updateReferences() di HTML berjalan
+    saturationSelect.dispatchEvent(new Event('change'));
+}
+
+// BAGIAN 2 & 3: PERHITUNGAN DYNAMIC COMPACTION
 let diagramDrawn = false;
 function calculateAreaA() {
     const soil = document.getElementById('soilType').value;
@@ -71,6 +168,8 @@ function calculateAreaA() {
     }
 
     Nround = Math.round(N);
+
+    document.getElementById('appliedEnergyA').value = E;
     document.getElementById('H_initial_A').innerText = Hawal;
     
     document.getElementById('H_planned_A').innerText = H;
@@ -288,4 +387,57 @@ function downloadImage() {
 
     // Trigger the load
     img.src = url;
+}
+
+// BAGIAN 5: EVALUASI PENINGKATAN KEPADATAN (TARGET GAMMA D)
+function calculateTargetGammaD() {
+    // Input
+    const drTargetVal = parseFloat(document.getElementById('Dr_target').value);
+    const gammaMin = parseFloat(document.getElementById('gamma_d_min').value);
+    const gammaMax = parseFloat(document.getElementById('gamma_d_max').value);
+
+    // Validasi
+    if (isNaN(drTargetVal) || isNaN(gammaMin) || isNaN(gammaMax)) {
+        alert("Pastikan nilai Dr Target, gamma_d(min), dan gamma_d(max) di Bagian 1 sudah terisi.");
+        return;
+    }
+    if (gammaMin >= gammaMax) {
+        alert("Nilai gamma_d(min) harus lebih kecil dari gamma_d(max). Cek input di Bagian 1.");
+        return;
+    }
+
+    // Konversi Dr dari persen ke desimal
+    const Dr = drTargetVal / 100;
+
+    // Rumus turunan dari definisi Relative Density (Dr) untuk mencari gamma_d (field/target)
+    // Dr = [ (gd - gd_min) / (gd_max - gd_min) ] * [ gd_max / gd ]
+    // Hasil matematis:
+    // gamma_d_target = (gamma_max * gamma_min) / (gamma_max - Dr * (gamma_max - gamma_min))
+    
+    const numerator = gammaMax * gammaMin;
+    const denominator = gammaMax - (Dr * (gammaMax - gammaMin));
+    
+    let gammaTarget = numerator / denominator;
+
+    // Pembulatan 2 desimal
+    gammaTarget = Math.round(gammaTarget * 100) / 100;
+
+    // Output
+    document.getElementById('gamma_d_after').value = gammaTarget;
+    
+    // Update teks kesimpulan
+    const conclusionText = document.getElementById('compaction_conclusion');
+    conclusionText.innerHTML = `Untuk mencapai Kepadatan Relatif <strong>${drTargetVal}%</strong>, <br>
+    Dynamic Compaction harus meningkatkan berat isi kering tanah menjadi minimal <strong>${gammaTarget} kN/m³</strong>.`;
+}
+
+// Fungsi untuk updateReferences jika diperlukan oleh onchange di HTML
+function updateReferences() {
+    // Logika tambahan jika ingin mengubah tampilan tabel referensi berdasarkan pilihan dropdown
+    // Saat ini dibiarkan kosong atau bisa diimplementasikan nanti.
+}
+
+// Fungsi untuk updateCalculation jika diperlukan agar auto-recalculate saat input berubah
+function updateCalculation() {
+    // Opsional: Bisa memanggil calculateAreaA() otomatis
 }
