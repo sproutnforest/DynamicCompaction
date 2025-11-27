@@ -187,6 +187,69 @@
         </section>
 
         <hr class="my-4">
+<hr class="my-4">
+
+<section class="mb-5 p-3 border rounded">
+    <h2 class="text-info border-bottom pb-2 mb-3">3. Kepadatan Relatif (Dr) Tanah Awal</h2>
+    <p class="small text-muted">Parameter ini digunakan untuk menilai tingkat kepadatan awal tanah (biasanya tanah berbutir/non-kohesif) sebelum pemadatan.</p>
+    
+    <div class="row g-3">
+        <div class="col-md-6">
+            <h4 class="h6 fw-bold">A. Berdasarkan Angka Pori (Void Ratio, e)</h4>
+            <div class="form-floating mb-2">
+                <input type="number" id="e_max" class="form-control" value="0.8" step="0.01">
+                <label for="e_max" class="form-label small">Angka Pori Maksimum (emax)</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="number" id="e_min" class="form-control" value="0.4" step="0.01">
+                <label for="e_min" class="form-label small">Angka Pori Minimum (emin)</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="number" id="e_field" class="form-control" value="0.75" step="0.01">
+                <label for="e_field" class="form-label small">Angka Pori Lapangan (e)</label>
+            </div>
+            <button onclick="calculateDr('voidRatio')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Angka Pori)</button>
+        </div>
+
+        <div class="col-md-6">
+            <h4 class="h6 fw-bold">B. Berdasarkan Berat Isi Kering (Dry Unit Weight)</h4>
+            <div class="form-floating mb-2">
+                <input type="number" id="gamma_d_min" class="form-control" value="14.5" step="0.1">
+                <label for="gamma_d_min" class="form-label small">Berat Isi Kering Paling Longgar (gamma_d(min))[kN/m³]</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="number" id="gamma_d_max" class="form-control" value="18.5" step="0.1">
+                <label for="gamma_d_max" class="form-label small">Berat Isi Kering Paling Padat (gamma_d(max))[kN/m³]</label>
+            </div>
+            <div class="form-floating mb-2">
+                <input type="number" id="gamma_d_field" class="form-control" value="15.0" step="0.1">
+                <label for="gamma_d_field" class="form-label small">Berat Isi Kering Lapangan (gamma_d)[kN/m³]</label>
+            </div>
+            <button onclick="calculateDr('dryUnitWeight')" class="btn btn-sm btn-outline-info w-100">Hitung Dr (Berat Isi Kering)</button>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-3" role="alert">
+        <h3 class="h6 alert-heading mb-1">Hasil Kepadatan Relatif Awal (Dr Awal): 
+            <span class="fw-bold" id="Dr_initial_result">-</span>
+        </h3>
+        <p class="mb-0">Klasifikasi Kepadatan: <span class="fw-bold" id="Dr_initial_classification">-</span></p>
+    </div>
+    
+    <h6 class="fw-bold text-center mt-4">Tabel Klasifikasi Kepadatan Relatif</h6>
+    <table class="table table-sm table-bordered table-ref text-center">
+        <thead class="table-dark">
+            <tr><th>Relative Density (%)</th><th>Classification</th></tr>
+        </thead>
+        <tbody>
+            <tr><td> < 15</td><td>Very Loose</td></tr>
+            <tr><td>15 - 35</td><td>Loose</td></tr>
+            <tr><td>35 - 65</td><td>Medium dense</td></tr>
+            <tr><td>65 - 85</td><td>Dense</td></tr>
+            <tr><td>> 85</td><td>Very Dense</td></tr>
+        </tbody>
+    </table>
+</section>
 
         <div class="row g-4">
             
@@ -215,57 +278,37 @@
                     </div>
                 </section>
             </div>
-        </div>
 
         <hr class="my-4">
 
-        <div class="row g-4">
-            <div class="col-12">
-                <section class="card shadow-sm" id="spt-evaluation-section">
-                    <div class="card-header bg-info text-white">
-                        <h2 class="card-title h5 mb-0">3. Evaluasi Kinerja (Uji SPT Pasca-DC)</h2>
-                    </div>
-                    <div class="card-body">
-                        <p class="small text-muted">Masukkan data SPT yang diuji setelah Dynamic Compaction (DC) untuk memverifikasi kepadatan.</p>
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label for="N_pre" class="form-label fw-bold">N-SPT Rata-rata Pra-DC:</label>
-                                <input type="number" id="N_pre" class="form-control" value="8" step="1">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="N_post" class="form-label fw-bold">N-SPT Rata-rata Pasca-DC:</label>
-                                <input type="number" id="N_post" class="form-control" value="18" step="1">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="MAT_depth" class="form-label small fw-bold">Kedalaman MAT (m):</label>
-                                <input type="number" id="MAT_depth" class="form-control form-control-sm" value="2.0" step="0.1">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="gamma_soil" class="form-label small fw-bold">Berat Isi Tanah Rata-rata (kN/m³):</label>
-                                <input type="number" id="gamma_soil" class="form-control form-control-sm" value="19.0" step="0.1">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="spt_efficiency" class="form-label small fw-bold">Efisiensi Bor (Er):</label>
-                                <input type="number" id="spt_efficiency" class="form-control form-control-sm" value="0.70" step="0.01">
-                            </div>
-                        </div>
+        <div class="col-12">
+        <section class="card shadow-sm" id="evaluation-section">
+        <div class="card-header bg-success text-white">
+            <h2 class="card-title h5 mb-0">5. Evaluasi Peningkatan Kepadatan</h2>
+        </div>
+        <div class="card-body">
+            <p class="small text-muted">Asumsikan Dynamic Compaction berhasil meningkatkan Kepadatan Relatif ke nilai target.</p>
 
-                        <button onclick="calculateSPTPerformance()" class="btn btn-info w-100 mt-2">Hitung Peningkatan Kepadatan N1</button>
-
-                        <div class="alert alert-primary mt-3" role="alert">
-                            <h3 class="h6 alert-heading">Hasil N-SPT Terkoreksi:</h3>
-                            <ul class="list-unstyled mb-0">
-                                <li>N1 Terkoreksi Pasca-DC (N1,post): <span class="fw-bold" id="N1_post_result">-</span></li>
-                                <li>Rasio Peningkatan (Npost/Npre): <span class="fw-bold" id="Improvement_Ratio">-</span></li>
-                                <li>Kesimpulan Kepadatan: <span class="fw-bold" id="SPT_Conclusion">-</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label for="Dr_target" class="form-label fw-bold">Target Kepadatan Relatif (Dr Target) [%]:</label>
+                    <input type="number" id="Dr_target" class="form-control" value="70" step="1">
+                    <span class="form-text">Nilai Dr yang diinginkan setelah pemadatan.</span>
+                </div>
+                <div class="col-md-6">
+                    <label for="gamma_d_after" class="form-label fw-bold">Berat Isi Kering Setelah Kompaksi (gamma_d Akhir) [kN/m³]:</label>
+                    <input type="number" id="gamma_d_after" class="form-control form-control-sm bg-light" value="0" step="0.1" readonly>
+                    <span class="form-text">Nilai gamma_d yang sesuai dengan (Dr Target).</span>
+                </div>
+            </div>
+            <button onclick="calculateTargetGammaD()" class="btn btn-success w-100">Hitung gamma_d Akhir</button>
+            <div class="alert alert-warning mt-3" role="alert">
+                <h3 class="h6 alert-heading">Kesimpulan:</h3>
+                <p id="compaction_conclusion" class="mb-0">Tekan tombol di atas untuk melihat target berat isi kering setelah pemadatan.</p>
             </div>
         </div>
-
-        <hr class="my-4">
+    </section>
+</div>
 
         <section class="mb-5 p-3 border rounded bg-light-subtle">
             <h2 class="text-secondary border-bottom pb-2 mb-3">4. Grid Pemadatan Dinamik</h2>
@@ -276,7 +319,7 @@
             </div>
             
             <button onclick="downloadImage()" class="btn btn-secondary mt-3"><i class="bi bi-download"></i> Download Diagram </button>
-             </section>
+        </section>
         
     </div>
     
